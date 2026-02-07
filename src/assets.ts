@@ -1,8 +1,9 @@
 import ConfigFile from "../config.json";
 
 if (
-  ConfigFile.music.provider !== "meting" &&
-  ConfigFile.music.provider !== "nano-meting"
+  ConfigFile.music !== undefined &&
+  ConfigFile.music?.provider !== "meting" &&
+  ConfigFile.music?.provider !== "nano-meting"
 ) {
   throw new Error("不支持其他提供者");
 }

@@ -12,7 +12,7 @@ import { access, constants, readdir, rm, writeFile } from "fs/promises";
 import color from "picocolors";
 
 const CONFIG_PATH = "config.json";
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: Config = {
   title: "网站标题",
   name: "你的名字",
   desc: "一句话描述你自己",
@@ -30,6 +30,11 @@ const DEFAULT_CONFIG = {
       href: "https://example.com/",
     },
   ],
+  music: {
+    autoplay: false,
+    provider: "meting",
+    url: "你的 Metting 歌曲列表 URL",
+  },
 };
 
 const handleCancel = <T>(f: T | symbol) => {
@@ -159,10 +164,26 @@ async function main() {
       break;
     }
   }
-  await writeFile(
-    CONFIG_PATH,
-    JSON.stringify({ title, name, desc, link, site }, undefined, 2),
-  );
+  const output: Config = { title, name, desc, link, site, music: undefined };
+  if (
+    await confirm({
+      message: "启用音乐",
+    }).then(handleCancel)
+  ) {
+    const autoplay = await confirm({
+      message: "启用自动播放",
+    }).then(handleCancel);
+    const url = await text({
+      message: "Meting 播放页 url",
+      validate: needText,
+    }).then(handleCancel);
+    output.music = {
+      autoplay,
+      url,
+      provider: "meting",
+    };
+  }
+  await writeFile(CONFIG_PATH, JSON.stringify(output, undefined, 2));
   outro(`${CONFIG_PATH} 已生成。`);
 }
 

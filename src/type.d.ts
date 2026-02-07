@@ -22,5 +22,5 @@ declare type Config = {
   desc: string;
   link: LinkItem[];
   site: SiteItem[];
-  music: MusicSettings;
+  music: MusicSettings | undefined;
 };

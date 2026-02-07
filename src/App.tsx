@@ -33,8 +33,8 @@ const onSearch = (
   location.assign(url);
 };
 
-function fetchPlaylist() {
-  return fetch(config.music.url)
+function fetchPlaylist(url: string) {
+  return fetch(url)
     .then((i) => i.json())
     .then((i) => MetingRsp.parseAsync(i));
 }
@@ -46,10 +46,13 @@ const App: Component = () => {
   );
 
   const [index, setIndex] = createSignal(undefined as number | undefined);
-  fetchPlaylist().then((i) => {
-    setPlaylist(i);
-    setIndex(i.length === 0 ? undefined : Math.floor(Math.random() * i.length));
-  });
+  config.music?.url !== undefined &&
+    fetchPlaylist(config.music.url).then((i) => {
+      setPlaylist(i);
+      setIndex(
+        i.length === 0 ? undefined : Math.floor(Math.random() * i.length),
+      );
+    });
   const currentInfo = createMemo(() => {
     const pl = playlist();
     const id = index();
@@ -63,7 +66,7 @@ const App: Component = () => {
   const src = createMemo(() => currentInfo()?.url);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const trackSrc = createReaction(() => audioEle.play());
-  if (config.music.autoplay) {
+  if (config.music?.autoplay ?? false) {
     trackSrc(() => src());
   }
   const audioEle = (
